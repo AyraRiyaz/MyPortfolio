@@ -440,6 +440,7 @@ h6 {
   .mobile-nav-active .navmenu>ul {
     display: block;
   }
+  
 }
 
 /*--------------------------------------------------------------
@@ -688,6 +689,7 @@ section,
 /*--------------------------------------------------------------
 # Hero Section
 --------------------------------------------------------------*/
+/* Hero Section */
 .hero {
   width: 100%;
   min-height: 100vh;
@@ -698,42 +700,7 @@ section,
   justify-content: center;
 }
 
-
-.home_img {
-  position: absolute;
-  right: 15%; /* Adjust to control how far the image is from the right edge */
-  top: 50%; /* Vertically centers the image */
-  transform: translateY(-50%); /* Centers the image precisely */
-}
-
-.home_img_class {
-  width: 300px; /* Set the container size */
-  height: 300px; /* Ensure the height matches the width */
-  border-radius: 50%; /* Makes the container circular */
-  overflow: hidden; /* Hides overflow to ensure the circular shape */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Adds a soft shadow for depth */
-  border: 5px solid #ffffff; /* White border around the image */
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
-}
-
-.home_img_class img {
-  width: 100%; /* Make sure the image fits the container */
-  height: 100%;
-  object-fit: cover; /* Ensure the image covers the container without distortion */
-  border-radius: 50%; /* Makes the image itself circular */
-}
-
-.home_img_class:hover {
-  transform: scale(1.05); /* Slight zoom effect on hover */
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
-}
-
-
-
-
+/* Hero Heading and Text */
 .hero h2 {
   margin: 0;
   font-size: 64px;
@@ -775,7 +742,6 @@ section,
   box-shadow: 0 0 0 3px rgba(22, 181, 99, 0.4); /* Optional: custom focus shadow */
 }
 
-
 .hero .social-links {
   margin-top: 25px;
 }
@@ -798,7 +764,48 @@ section,
   background-color: var(--accent-color);
 }
 
+
+/* Home Image Container */
+.home_img {
+  position: absolute;
+  right: 15%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.home_img_class {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border: 5px solid #18d26e;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home_img_class img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.home_img_class:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+  .hero {
+    padding: 60px 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
   .hero h2 {
     font-size: 32px;
   }
@@ -806,7 +813,36 @@ section,
   .hero p {
     font-size: 20px;
   }
+
+
+
+  .home_img {
+    position: static;
+    margin-top: 20px;
+    transform: none;
+  }
+
+  .home_img_class {
+    width: 200px;
+    height: 200px;
+  }
 }
+
+@media (max-width: 480px) {
+  .hero h2 {
+    font-size: 28px;
+  }
+
+  .hero p {
+    font-size: 18px;
+  }
+
+  .home_img_class {
+    width: 150px;
+    height: 150px;
+  }
+}
+
 
 /*--------------------------------------------------------------
 # About Section
@@ -842,6 +878,7 @@ section,
   width: 300px; /* Set a specific width for the image */
   height: 300px; /* Set the height equal to the width */
   border-radius: 50%; /* Make the image circular */
+  border: 5px solid #18d26e;
   object-fit: cover; /* Ensures the image fits the circular container without distortion */
   overflow: hidden;
   display: block;
