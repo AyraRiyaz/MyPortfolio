@@ -1,0 +1,1 @@
+This project is a sleek, responsive personal portfolio website designed to showcase my work, skills, and professional background. Built to provide an intuitive and engaging user experience, the site organizes my projects, resume, and contact information in a way that reflects my unique style and technical capabilities.
