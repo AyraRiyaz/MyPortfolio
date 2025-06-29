@@ -380,9 +380,7 @@ const Contact = () => {
                   )}
                 </motion.button>
 
-                <p className="text-xs text-theme-text-secondary text-center">
-                  Your message will be sent securely via Web3Forms. I typically respond within 24 hours.
-                </p>
+                
               </form>
             )}
           </motion.div>
