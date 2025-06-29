@@ -83,7 +83,7 @@ const Contact = () => {
       
       if (result.success) {
         setSubmitStatus('success');
-        setStatusMessage(`Message sent successfully via ${result.method}! I'll get back to you soon.`);
+        setStatusMessage('Message sent successfully! Thank you for reaching out. I\'ll get back to you soon.');
         setFormData({ name: "", email: "", message: "" });
         
         // Reset success message after 5 seconds
@@ -275,7 +275,7 @@ const Contact = () => {
                 <h4 className="text-xl font-bold text-theme-text mb-2">
                   Message Sent Successfully!
                 </h4>
-                <p className="text-theme-text-secondary text-center">
+                <p className="text-theme-text-secondary text-center mb-4">
                   {statusMessage}
                 </p>
                 <motion.button
@@ -283,7 +283,7 @@ const Contact = () => {
                     setSubmitStatus('idle');
                     setStatusMessage('');
                   }}
-                  className="mt-4 text-primary-500 hover:text-primary-400 transition-colors"
+                  className="text-primary-500 hover:text-primary-400 transition-colors font-medium"
                   whileHover={{ scale: 1.05 }}
                 >
                   Send Another Message
@@ -386,7 +386,7 @@ const Contact = () => {
                 </motion.button>
 
                 <p className="text-xs text-theme-text-secondary text-center">
-                  Your message will be sent securely. I typically respond within 24 hours.
+                  Your message will be sent securely via Web3Forms. I typically respond within 24 hours.
                 </p>
               </form>
             )}
