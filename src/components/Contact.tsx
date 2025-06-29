@@ -39,17 +39,16 @@ const Contact = () => {
     setSubmitStatus('idle');
 
     try {
+      // Create FormData for proper form submission
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('message', formData.message);
+      formDataToSend.append('subject', `New message from ${formData.name} - Portfolio Contact`);
+
       const response = await fetch('https://formkeep.com/p/6d923daddeceb539cf7d3d5b99662cfb', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          message: formData.message,
-          subject: `New message from ${formData.name} - Portfolio Contact`,
-        }),
+        body: formDataToSend,
       });
 
       if (response.ok) {
@@ -261,7 +260,10 @@ const Contact = () => {
                   Oops! Something went wrong
                 </h4>
                 <p className="text-theme-text-secondary mb-4">
-                  There was an error sending your message. Please try again or contact me directly.
+                  There was an error sending your message. Please try again or contact me directly at{" "}
+                  <a href="mailto:riyazayra@gmail.com" className="text-primary-400 hover:underline">
+                    riyazayra@gmail.com
+                  </a>
                 </p>
                 <motion.button
                   onClick={() => setSubmitStatus('idle')}
@@ -356,6 +358,31 @@ const Contact = () => {
                     </>
                   )}
                 </motion.button>
+
+                {/* Alternative Contact Methods */}
+                <div className="mt-6 pt-6 border-t border-theme-border">
+                  <p className="text-theme-text-secondary text-sm text-center mb-4">
+                    Prefer direct contact?
+                  </p>
+                  <div className="flex justify-center space-x-4">
+                    <a
+                      href="mailto:riyazayra@gmail.com"
+                      className="flex items-center gap-2 px-4 py-2 bg-primary-500/10 text-primary-400 rounded-lg border border-primary-500/20 hover:bg-primary-500/20 transition-all text-sm"
+                    >
+                      <Mail size={16} />
+                      Email Me
+                    </a>
+                    <a
+                      href="https://linkedin.com/in/kp-ayra-riyaz"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20 hover:bg-blue-500/20 transition-all text-sm"
+                    >
+                      <Linkedin size={16} />
+                      LinkedIn
+                    </a>
+                  </div>
+                </div>
               </form>
             )}
           </motion.div>
