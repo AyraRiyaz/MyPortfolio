@@ -1,0 +1,260 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for Theme Colors */
+:root {
+  /* Dark Theme (Default) */
+  --theme-bg: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d1b69 100%);
+  --theme-surface: rgba(51, 51, 51, 0.5);
+  --theme-nav: rgba(15, 15, 15, 0.8);
+  --theme-text: #ffffff;
+  --theme-text-secondary: #d1d5db;
+  --theme-border: rgba(168, 85, 247, 0.2);
+}
+
+.light {
+  /* Light Theme - Reduced background opacity, increased text contrast */
+  --theme-bg: linear-gradient(135deg, #ffffff 0%, #fafafa 50%, #f3f0ff 100%);
+  --theme-surface: rgba(255, 255, 255, 0.95);
+  --theme-nav: rgba(255, 255, 255, 0.95);
+  --theme-text: #111827;
+  --theme-text-secondary: #374151;
+  --theme-border: rgba(168, 85, 247, 0.4);
+}
+
+/* Custom Background Grid Pattern */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(168, 85, 247, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(168, 85, 247, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Light theme grid pattern with better visibility */
+.light .bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(168, 85, 247, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(168, 85, 247, 0.15) 1px, transparent 1px);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--theme-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #a855f7, #d946ef);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #9333ea, #c026d3);
+}
+
+/* Selection colors */
+::selection {
+  background-color: rgba(168, 85, 247, 0.3);
+  color: var(--theme-text);
+}
+
+::-moz-selection {
+  background-color: rgba(168, 85, 247, 0.3);
+  color: var(--theme-text);
+}
+
+/* Focus outline */
+*:focus-visible {
+  outline: 2px solid #a855f7;
+  outline-offset: 2px;
+}
+
+/* Ensure no horizontal overflow */
+body {
+  overflow-x: hidden;
+  background: var(--theme-bg);
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: var(--theme-surface);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--theme-border);
+}
+
+/* Text gradient utility */
+.text-gradient {
+  background: linear-gradient(135deg, #a855f7, #d946ef);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Purple glow effect */
+.glow {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Animated background */
+.animated-bg {
+  background: var(--theme-bg);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+/* Light theme specific styles - Reduced opacity for better text visibility */
+.light .animated-bg {
+  background: linear-gradient(-45deg, #ffffff, #fafafa, #f3f0ff, #ede9fe);
+  background-size: 400% 400%;
+}
+
+/* Purple particle effects */
+.purple-particles {
+  position: relative;
+  overflow: hidden;
+}
+
+.purple-particles::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 25% 25%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(217, 70, 239, 0.1) 0%, transparent 50%);
+  animation: float 8s ease-in-out infinite;
+}
+
+/* Light theme particles with reduced opacity */
+.light .purple-particles::before {
+  background-image: radial-gradient(circle at 25% 25%, rgba(168, 85, 247, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(217, 70, 239, 0.05) 0%, transparent 50%);
+}
+
+/* Theme transition */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Light theme text colors - Enhanced contrast */
+.light .text-white {
+  color: #111827 !important;
+}
+
+.light .text-gray-300 {
+  color: #374151 !important;
+}
+
+.light .text-gray-400 {
+  color: #4b5563 !important;
+}
+
+.light .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+/* Light theme background adjustments - Better contrast */
+.light .bg-dark-700\/50 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+}
+
+.light .bg-dark-800 {
+  background: linear-gradient(135deg, #fafafa 0%, #f3f0ff 100%) !important;
+}
+
+.light .bg-dark-900 {
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%) !important;
+}
+
+.light .bg-dark-600\/50 {
+  background-color: rgba(249, 250, 251, 0.9) !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Light theme border colors - Enhanced visibility */
+.light .border-primary-500\/20 {
+  border-color: rgba(168, 85, 247, 0.4) !important;
+}
+
+.light .border-primary-500\/40 {
+  border-color: rgba(168, 85, 247, 0.6) !important;
+}
+
+.light .border-primary-500\/30 {
+  border-color: rgba(168, 85, 247, 0.5) !important;
+}
+
+/* Light theme surface backgrounds */
+.light .bg-theme-surface {
+  background: linear-gradient(135deg, #fafafa 0%, #f3f0ff 100%) !important;
+}
+
+/* Light theme gradient backgrounds */
+.light .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #ffffff, #fafafa, #f3f0ff) !important;
+}
+
+/* Light theme component specific fixes */
+.light .bg-primary-500\/10 {
+  background-color: rgba(168, 85, 247, 0.15) !important;
+}
+
+.light .bg-primary-500\/20 {
+  background-color: rgba(168, 85, 247, 0.2) !important;
+}
+
+.light .bg-secondary-500\/20 {
+  background-color: rgba(217, 70, 239, 0.2) !important;
+}
+
+/* Enhanced text contrast for light theme */
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+  color: #111827 !important;
+}
+
+.light p {
+  color: #374151 !important;
+}
+
+.light .text-theme-text {
+  color: #111827 !important;
+}
+
+.light .text-theme-text-secondary {
+  color: #374151 !important;
+}
