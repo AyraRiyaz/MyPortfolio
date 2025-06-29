@@ -13,7 +13,7 @@ import {
   AlertCircle,
   Loader,
 } from "lucide-react";
-import { sendEmail, type ContactFormData } from "../services/emailService";
+import { sendContactEmail, type ContactFormData } from "../services/emailService";
 
 const Contact = () => {
   const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: true });
@@ -24,7 +24,7 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -33,92 +33,72 @@ const Contact = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    
+    // Clear any previous error messages when user starts typing
+    if (submitStatus === 'error') {
+      setSubmitStatus('idle');
+      setStatusMessage('');
+    }
   };
 
-  const validateForm = (): boolean => {
+  const validateForm = (): string | null => {
     if (!formData.name.trim()) {
-      setErrorMessage('Please enter your name');
-      return false;
+      return 'Please enter your name';
+    }
+    if (formData.name.trim().length < 2) {
+      return 'Name must be at least 2 characters long';
     }
     if (!formData.email.trim()) {
-      setErrorMessage('Please enter your email');
-      return false;
+      return 'Please enter your email';
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setErrorMessage('Please enter a valid email address');
-      return false;
+      return 'Please enter a valid email address';
     }
     if (!formData.message.trim()) {
-      setErrorMessage('Please enter your message');
-      return false;
+      return 'Please enter your message';
     }
-    return true;
+    if (formData.message.trim().length < 10) {
+      return 'Message must be at least 10 characters long';
+    }
+    return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    // Validate form
+    const validationError = validateForm();
+    if (validationError) {
       setSubmitStatus('error');
+      setStatusMessage(validationError);
       return;
     }
 
     setIsSubmitting(true);
     setSubmitStatus('idle');
-    setErrorMessage('');
+    setStatusMessage('');
 
     try {
-      // Try multiple email sending methods
-      let success = false;
+      const result = await sendContactEmail(formData);
       
-      // Method 1: Try EmailJS
-      try {
-        success = await sendEmail(formData);
-      } catch (error) {
-        console.log('EmailJS failed, trying alternative method');
-      }
-
-      // Method 2: Fallback to Web3Forms (your original working method)
-      if (!success) {
-        const formDataObj = new FormData();
-        formDataObj.append('access_key', '7104df67-8127-428f-bbb3-03224c222c64');
-        formDataObj.append('name', formData.name);
-        formDataObj.append('email', formData.email);
-        formDataObj.append('message', formData.message);
-        formDataObj.append('subject', 'New message from Ayra\'s portfolio');
-        formDataObj.append('from_name', 'Portfolio Contact Form');
-
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          body: formDataObj,
-        });
-
-        const result = await response.json();
-        success = result.success;
-        
-        if (!success) {
-          setErrorMessage(result.message || 'Failed to send message');
-        }
-      }
-
-      if (success) {
+      if (result.success) {
         setSubmitStatus('success');
+        setStatusMessage(`Message sent successfully via ${result.method}! I'll get back to you soon.`);
         setFormData({ name: "", email: "", message: "" });
         
         // Reset success message after 5 seconds
         setTimeout(() => {
           setSubmitStatus('idle');
+          setStatusMessage('');
         }, 5000);
       } else {
         setSubmitStatus('error');
-        if (!errorMessage) {
-          setErrorMessage('Failed to send message. Please try again.');
-        }
+        setStatusMessage(result.error || 'Failed to send message. Please try again.');
       }
     } catch (error) {
       console.error('Submit error:', error);
       setSubmitStatus('error');
-      setErrorMessage('Network error. Please check your connection and try again.');
+      setStatusMessage('Network error. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -295,20 +275,30 @@ const Contact = () => {
                 <h4 className="text-xl font-bold text-theme-text mb-2">
                   Message Sent Successfully!
                 </h4>
-                <p className="text-theme-text-secondary">
-                  Thank you for reaching out. I'll get back to you soon.
+                <p className="text-theme-text-secondary text-center">
+                  {statusMessage}
                 </p>
+                <motion.button
+                  onClick={() => {
+                    setSubmitStatus('idle');
+                    setStatusMessage('');
+                  }}
+                  className="mt-4 text-primary-500 hover:text-primary-400 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  Send Another Message
+                </motion.button>
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                {submitStatus === 'error' && (
+                {submitStatus === 'error' && statusMessage && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400"
+                    className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400"
                   >
-                    <AlertCircle size={20} />
-                    <span className="text-sm">{errorMessage}</span>
+                    <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">{statusMessage}</span>
                   </motion.div>
                 )}
 
@@ -385,7 +375,7 @@ const Contact = () => {
                   {isSubmitting ? (
                     <>
                       <Loader className="animate-spin" size={20} />
-                      Sending...
+                      Sending Message...
                     </>
                   ) : (
                     <>
@@ -394,6 +384,10 @@ const Contact = () => {
                     </>
                   )}
                 </motion.button>
+
+                <p className="text-xs text-theme-text-secondary text-center">
+                  Your message will be sent securely. I typically respond within 24 hours.
+                </p>
               </form>
             )}
           </motion.div>

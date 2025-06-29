@@ -1,9 +1,9 @@
 import emailjs from '@emailjs/browser';
 
-// EmailJS configuration
-const EMAILJS_SERVICE_ID = 'service_portfolio'; // You'll need to replace this
-const EMAILJS_TEMPLATE_ID = 'template_contact'; // You'll need to replace this
-const EMAILJS_PUBLIC_KEY = 'your_public_key'; // You'll need to replace this
+// EmailJS configuration - Replace these with your actual values
+const EMAILJS_SERVICE_ID = 'service_portfolio'; // Replace with your EmailJS service ID
+const EMAILJS_TEMPLATE_ID = 'template_contact'; // Replace with your EmailJS template ID
+const EMAILJS_PUBLIC_KEY = 'your_public_key_here'; // Replace with your EmailJS public key
 
 export interface ContactFormData {
   name: string;
@@ -13,95 +13,88 @@ export interface ContactFormData {
 
 export const sendEmail = async (formData: ContactFormData): Promise<boolean> => {
   try {
-    // Initialize EmailJS (only needs to be done once)
+    // Initialize EmailJS with your public key
     emailjs.init(EMAILJS_PUBLIC_KEY);
 
-    // Prepare template parameters
+    // Prepare template parameters that match your EmailJS template
     const templateParams = {
       from_name: formData.name,
       from_email: formData.email,
       message: formData.message,
-      to_email: 'riyazayra@gmail.com', // Your email
+      to_email: 'riyazayra@gmail.com',
       reply_to: formData.email,
+      subject: `New Portfolio Contact from ${formData.name}`,
     };
 
-    // Send email
+    // Send email using EmailJS
     const response = await emailjs.send(
       EMAILJS_SERVICE_ID,
       EMAILJS_TEMPLATE_ID,
       templateParams
     );
 
-    console.log('Email sent successfully:', response);
+    console.log('EmailJS response:', response);
+    return response.status === 200;
+  } catch (error) {
+    console.error('EmailJS failed:', error);
+    throw error; // Re-throw to allow fallback handling
+  }
+};
+
+// Enhanced Web3Forms fallback (your current working method)
+export const sendEmailWeb3Forms = async (formData: ContactFormData): Promise<boolean> => {
+  try {
+    const formDataObj = new FormData();
+    formDataObj.append('access_key', '7104df67-8127-428f-bbb3-03224c222c64');
+    formDataObj.append('name', formData.name);
+    formDataObj.append('email', formData.email);
+    formDataObj.append('message', formData.message);
+    formDataObj.append('subject', `New Portfolio Message from ${formData.name}`);
+    formDataObj.append('from_name', 'Ayra Portfolio Contact Form');
+    formDataObj.append('redirect', 'false'); // Prevent redirect
+    formDataObj.append('botcheck', ''); // Honeypot for spam protection
+
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formDataObj,
+    });
+
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.message || 'Web3Forms submission failed');
+    }
+    
     return true;
   } catch (error) {
-    console.error('Failed to send email:', error);
-    return false;
+    console.error('Web3Forms failed:', error);
+    throw error;
   }
 };
 
-// Alternative method using fetch to a serverless function
-export const sendEmailAlternative = async (formData: ContactFormData): Promise<boolean> => {
+// Main email sending function with multiple fallbacks
+export const sendContactEmail = async (formData: ContactFormData): Promise<{
+  success: boolean;
+  method?: string;
+  error?: string;
+}> => {
+  // Method 1: Try EmailJS first
   try {
-    const response = await fetch('/api/send-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to: 'riyazayra@gmail.com',
-        subject: `New message from ${formData.name}`,
-        html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${formData.name}</p>
-          <p><strong>Email:</strong> ${formData.email}</p>
-          <p><strong>Message:</strong></p>
-          <p>${formData.message.replace(/\n/g, '<br>')}</p>
-        `,
-      }),
-    });
-
-    return response.ok;
-  } catch (error) {
-    console.error('Failed to send email:', error);
-    return false;
+    await sendEmail(formData);
+    return { success: true, method: 'EmailJS' };
+  } catch (emailjsError) {
+    console.log('EmailJS failed, trying Web3Forms fallback...');
   }
-};
 
-// Simple SMTP.js implementation (client-side email sending)
-export const sendEmailSMTP = async (formData: ContactFormData): Promise<boolean> => {
+  // Method 2: Fallback to Web3Forms
   try {
-    // Load SMTP.js dynamically
-    const script = document.createElement('script');
-    script.src = 'https://smtpjs.com/v3/smtp.js';
-    document.head.appendChild(script);
-
-    return new Promise((resolve) => {
-      script.onload = () => {
-        // @ts-ignore - SMTP.js global
-        window.Email.send({
-          Host: 'smtp.elasticemail.com', // You'll need to configure this
-          Username: 'your-email@gmail.com', // Your SMTP username
-          Password: 'your-smtp-password', // Your SMTP password
-          To: 'riyazayra@gmail.com',
-          From: 'your-email@gmail.com',
-          Subject: `New message from ${formData.name}`,
-          Body: `
-            Name: ${formData.name}
-            Email: ${formData.email}
-            Message: ${formData.message}
-          `,
-        }).then((message: string) => {
-          console.log('Email sent:', message);
-          resolve(message === 'OK');
-        }).catch((error: any) => {
-          console.error('SMTP error:', error);
-          resolve(false);
-        });
-      };
-    });
-  } catch (error) {
-    console.error('Failed to load SMTP.js:', error);
-    return false;
+    await sendEmailWeb3Forms(formData);
+    return { success: true, method: 'Web3Forms' };
+  } catch (web3Error) {
+    console.error('All email methods failed:', web3Error);
+    return { 
+      success: false, 
+      error: 'Failed to send message. Please try again or contact directly via email.' 
+    };
   }
 };
