@@ -10,6 +10,8 @@ import {
   Github,
   ExternalLink,
   CheckCircle,
+  AlertCircle,
+  Loader,
 } from "lucide-react";
 
 const Contact = () => {
@@ -19,7 +21,8 @@ const Contact = () => {
     email: "",
     message: "",
   });
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -30,14 +33,43 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: "", email: "", message: "" });
-    }, 3000);
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const response = await fetch('https://formkeep.com/p/6d923daddeceb539cf7d3d5b99662cfb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          subject: `New message from ${formData.name} - Portfolio Contact`,
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({ name: "", email: "", message: "" });
+        setTimeout(() => {
+          setSubmitStatus('idle');
+        }, 5000);
+      } else {
+        throw new Error('Failed to submit form');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setSubmitStatus('error');
+      setTimeout(() => {
+        setSubmitStatus('idle');
+      }, 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -198,7 +230,7 @@ const Contact = () => {
               Send a Message
             </h3>
 
-            {isSubmitted ? (
+            {submitStatus === 'success' ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -209,51 +241,55 @@ const Contact = () => {
                   size={64}
                 />
                 <h4 className="text-xl font-bold text-theme-text mb-2">
-                  Message Sent!
+                  Message Sent Successfully!
                 </h4>
                 <p className="text-theme-text-secondary">
                   Thank you for reaching out. I'll get back to you soon.
                 </p>
               </motion.div>
-            ) : (
-              <form
-                method="POST"
-                action="https://api.web3forms.com/submit"
-                className="space-y-6"
-                onSubmit={() => setIsSubmitted(true)}
+            ) : submitStatus === 'error' ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-12"
               >
-                {/* REQUIRED: Web3Forms Access Key */}
-                <input
-                  type="hidden"
-                  name="access_key"
-                  value="7104df67-8127-428f-bbb3-03224c222c64"
+                <AlertCircle
+                  className="text-red-500 mx-auto mb-4"
+                  size={64}
                 />
-
-                {/* Optional: Extra fields for better email formatting */}
-                <input
-                  type="hidden"
-                  name="subject"
-                  value="New message from Ayra's portfolio"
-                />
-                <input
-                  type="hidden"
-                  name="from_name"
-                  value="Portfolio Contact Form"
-                />
-
+                <h4 className="text-xl font-bold text-theme-text mb-2">
+                  Oops! Something went wrong
+                </h4>
+                <p className="text-theme-text-secondary mb-4">
+                  There was an error sending your message. Please try again or contact me directly.
+                </p>
+                <motion.button
+                  onClick={() => setSubmitStatus('idle')}
+                  className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Try Again
+                </motion.button>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label
                     htmlFor="name"
                     className="block text-sm font-medium text-primary-400 mb-2"
                   >
-                    Your Name
+                    Your Name *
                   </label>
                   <input
                     type="text"
                     id="name"
                     name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -263,14 +299,17 @@ const Contact = () => {
                     htmlFor="email"
                     className="block text-sm font-medium text-primary-400 mb-2"
                   >
-                    Your Email
+                    Your Email *
                   </label>
                   <input
                     type="email"
                     id="email"
                     name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Enter your email address"
                   />
                 </div>
@@ -280,29 +319,42 @@ const Contact = () => {
                     htmlFor="message"
                     className="block text-sm font-medium text-primary-400 mb-2"
                   >
-                    Your Message
+                    Your Message *
                   </label>
                   <textarea
                     id="message"
                     name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
                     required
+                    disabled={isSubmitting}
                     rows={5}
-                    className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all resize-none"
+                    className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Tell me about your project or opportunity..."
                   />
                 </div>
 
                 <motion.button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-8 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 hover:from-primary-400 hover:to-secondary-400 transition-all duration-300"
-                  whileHover={{
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-8 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 hover:from-primary-400 hover:to-secondary-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  whileHover={!isSubmitting ? {
                     scale: 1.02,
                     boxShadow: "0 10px 30px rgba(168, 85, 247, 0.3)",
-                  }}
-                  whileTap={{ scale: 0.98 }}
+                  } : {}}
+                  whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                 >
-                  <Send size={20} />
-                  Send Message
+                  {isSubmitting ? (
+                    <>
+                      <Loader className="animate-spin" size={20} />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={20} />
+                      Send Message
+                    </>
+                  )}
                 </motion.button>
               </form>
             )}
