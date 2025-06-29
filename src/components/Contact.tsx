@@ -10,8 +10,8 @@ import {
   Github,
   ExternalLink,
   CheckCircle,
-  AlertCircle,
-  Loader,
+  Copy,
+  MessageSquare,
 } from "lucide-react";
 
 const Contact = () => {
@@ -21,8 +21,7 @@ const Contact = () => {
     email: "",
     message: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -33,46 +32,54 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus('idle');
+    
+    // Create email content
+    const subject = `Portfolio Contact from ${formData.name}`;
+    const body = `Hello Ayra,
+
+I'm reaching out through your portfolio website.
+
+Name: ${formData.name}
+Email: ${formData.email}
+
+Message:
+${formData.message}
+
+Best regards,
+${formData.name}`;
+
+    // Create mailto link
+    const mailtoLink = `mailto:riyazayra@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Open email client
+    window.location.href = mailtoLink;
+  };
+
+  const handleCopyToClipboard = async () => {
+    const contactText = `Name: ${formData.name}
+Email: ${formData.email}
+Message: ${formData.message}`;
 
     try {
-      // Create FormData for Web3Forms
-      const formDataToSend = new FormData();
-      formDataToSend.append('access_key', '7104df67-8127-428f-bbb3-03224c222c64');
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('message', formData.message);
-      formDataToSend.append('subject', `New Portfolio Contact from ${formData.name}`);
-      formDataToSend.append('from_name', 'Portfolio Contact Form');
-
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body: formDataToSend,
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setSubmitStatus('success');
-        setFormData({ name: "", email: "", message: "" });
-        setTimeout(() => {
-          setSubmitStatus('idle');
-        }, 5000);
-      } else {
-        throw new Error(result.message || 'Failed to submit form');
-      }
-    } catch (error) {
-      console.error('Form submission error:', error);
-      setSubmitStatus('error');
-      setTimeout(() => {
-        setSubmitStatus('idle');
-      }, 5000);
-    } finally {
-      setIsSubmitting(false);
+      await navigator.clipboard.writeText(contactText);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
     }
+  };
+
+  const handleWhatsAppSubmit = () => {
+    const message = `Hello Ayra! I'm ${formData.name}.
+
+${formData.message}
+
+You can reach me at: ${formData.email}`;
+    
+    const whatsappUrl = `https://wa.me/919207651458?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const contactInfo = [
@@ -233,162 +240,148 @@ const Contact = () => {
               Send a Message
             </h3>
 
-            {submitStatus === 'success' ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-12"
-              >
-                <CheckCircle
-                  className="text-green-500 mx-auto mb-4"
-                  size={64}
-                />
-                <h4 className="text-xl font-bold text-theme-text mb-2">
-                  Message Sent Successfully!
-                </h4>
-                <p className="text-theme-text-secondary">
-                  Thank you for reaching out. I'll get back to you soon.
-                </p>
-              </motion.div>
-            ) : submitStatus === 'error' ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-12"
-              >
-                <AlertCircle
-                  className="text-red-500 mx-auto mb-4"
-                  size={64}
-                />
-                <h4 className="text-xl font-bold text-theme-text mb-2">
-                  Oops! Something went wrong
-                </h4>
-                <p className="text-theme-text-secondary mb-4">
-                  There was an error sending your message. Please try again or contact me directly at{" "}
-                  <a href="mailto:riyazayra@gmail.com" className="text-primary-400 hover:underline">
-                    riyazayra@gmail.com
-                  </a>
-                </p>
-                <motion.button
-                  onClick={() => setSubmitStatus('idle')}
-                  className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+            <form onSubmit={handleEmailSubmit} className="space-y-6">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-primary-400 mb-2"
                 >
-                  Try Again
-                </motion.button>
-              </motion.div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-primary-400 mb-2"
-                  >
-                    Your Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    disabled={isSubmitting}
-                    className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder="Enter your full name"
-                  />
-                </div>
+                  Your Name *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
+                  placeholder="Enter your full name"
+                />
+              </div>
 
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-primary-400 mb-2"
-                  >
-                    Your Email *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    disabled={isSubmitting}
-                    className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder="Enter your email address"
-                  />
-                </div>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-primary-400 mb-2"
+                >
+                  Your Email *
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
+                  placeholder="Enter your email address"
+                />
+              </div>
 
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-primary-400 mb-2"
-                  >
-                    Your Message *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required
-                    disabled={isSubmitting}
-                    rows={5}
-                    className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder="Tell me about your project or opportunity..."
-                  />
-                </div>
+              <div>
+                <label
+                  htmlFor="message"
+                  className="block text-sm font-medium text-primary-400 mb-2"
+                >
+                  Your Message *
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  required
+                  rows={5}
+                  className="w-full px-4 py-3 glass border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all resize-none"
+                  placeholder="Tell me about your project or opportunity..."
+                />
+              </div>
 
+              {/* Multiple Contact Options */}
+              <div className="space-y-3">
                 <motion.button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-8 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 hover:from-primary-400 hover:to-secondary-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  whileHover={!isSubmitting ? {
+                  className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-8 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 hover:from-primary-400 hover:to-secondary-400 transition-all duration-300"
+                  whileHover={{
                     scale: 1.02,
                     boxShadow: "0 10px 30px rgba(168, 85, 247, 0.3)",
-                  } : {}}
-                  whileTap={!isSubmitting ? { scale: 0.98 } : {}}
+                  }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader className="animate-spin" size={20} />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send size={20} />
-                      Send Message
-                    </>
-                  )}
+                  <Mail size={20} />
+                  Open Email Client
                 </motion.button>
 
-                {/* Alternative Contact Methods */}
-                <div className="mt-6 pt-6 border-t border-theme-border">
-                  <p className="text-theme-text-secondary text-sm text-center mb-4">
-                    Prefer direct contact?
-                  </p>
-                  <div className="flex justify-center space-x-4">
-                    <a
-                      href="mailto:riyazayra@gmail.com"
-                      className="flex items-center gap-2 px-4 py-2 bg-primary-500/10 text-primary-400 rounded-lg border border-primary-500/20 hover:bg-primary-500/20 transition-all text-sm"
-                    >
-                      <Mail size={16} />
-                      Email Me
-                    </a>
-                    <a
-                      href="https://linkedin.com/in/kp-ayra-riyaz"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20 hover:bg-blue-500/20 transition-all text-sm"
-                    >
-                      <Linkedin size={16} />
-                      LinkedIn
-                    </a>
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <motion.button
+                    type="button"
+                    onClick={handleWhatsAppSubmit}
+                    className="bg-green-500 text-white px-4 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-green-600 transition-all duration-300"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <MessageSquare size={18} />
+                    WhatsApp
+                  </motion.button>
+
+                  <motion.button
+                    type="button"
+                    onClick={handleCopyToClipboard}
+                    className="bg-blue-500 text-white px-4 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-blue-600 transition-all duration-300"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {copySuccess ? (
+                      <>
+                        <CheckCircle size={18} />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={18} />
+                        Copy Info
+                      </>
+                    )}
+                  </motion.button>
                 </div>
-              </form>
-            )}
+              </div>
+
+              {/* Instructions */}
+              <div className="mt-6 p-4 bg-primary-500/10 border border-primary-500/20 rounded-lg">
+                <h4 className="text-primary-400 font-semibold mb-2">How it works:</h4>
+                <ul className="text-theme-text-secondary text-sm space-y-1">
+                  <li>• <strong>Email Client:</strong> Opens your default email app with pre-filled content</li>
+                  <li>• <strong>WhatsApp:</strong> Sends message directly via WhatsApp</li>
+                  <li>• <strong>Copy Info:</strong> Copies your details to clipboard for manual sending</li>
+                </ul>
+              </div>
+
+              {/* Direct Contact Fallback */}
+              <div className="mt-6 pt-6 border-t border-theme-border">
+                <p className="text-theme-text-secondary text-sm text-center mb-4">
+                  Prefer direct contact?
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <a
+                    href="mailto:riyazayra@gmail.com"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary-500/10 text-primary-400 rounded-lg border border-primary-500/20 hover:bg-primary-500/20 transition-all text-sm"
+                  >
+                    <Mail size={16} />
+                    Email Me
+                  </a>
+                  <a
+                    href="https://linkedin.com/in/kp-ayra-riyaz"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20 hover:bg-blue-500/20 transition-all text-sm"
+                  >
+                    <Linkedin size={16} />
+                    LinkedIn
+                  </a>
+                </div>
+              </div>
+            </form>
           </motion.div>
         </div>
       </div>
