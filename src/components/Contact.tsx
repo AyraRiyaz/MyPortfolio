@@ -39,26 +39,30 @@ const Contact = () => {
     setSubmitStatus('idle');
 
     try {
-      // Create FormData for proper form submission
+      // Create FormData for Web3Forms
       const formDataToSend = new FormData();
+      formDataToSend.append('access_key', '7104df67-8127-428f-bbb3-03224c222c64');
       formDataToSend.append('name', formData.name);
       formDataToSend.append('email', formData.email);
       formDataToSend.append('message', formData.message);
-      formDataToSend.append('subject', `New message from ${formData.name} - Portfolio Contact`);
+      formDataToSend.append('subject', `New Portfolio Contact from ${formData.name}`);
+      formDataToSend.append('from_name', 'Portfolio Contact Form');
 
-      const response = await fetch('https://formkeep.com/p/6d923daddeceb539cf7d3d5b99662cfb', {
+      const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         body: formDataToSend,
       });
 
-      if (response.ok) {
+      const result = await response.json();
+
+      if (result.success) {
         setSubmitStatus('success');
         setFormData({ name: "", email: "", message: "" });
         setTimeout(() => {
           setSubmitStatus('idle');
         }, 5000);
       } else {
-        throw new Error('Failed to submit form');
+        throw new Error(result.message || 'Failed to submit form');
       }
     } catch (error) {
       console.error('Form submission error:', error);
