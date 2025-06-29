@@ -86,14 +86,16 @@ const Hero = () => {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
             >
-              <a href="public\Resume-Ayra.pdf" download>
+              <a
+                href="/resume/Ayra_Riyaz_Resume.pdf"
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <motion.button
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0 0 25px rgba(168, 85, 247, 0.5)",
-                  }}
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-8 py-3 rounded-full font-semibold flex items-center gap-2 hover:from-primary-400 hover:to-secondary-400 transition-all shadow-lg"
+                  className="bg-primary-500 text-dark-900 px-8 py-3 rounded-full font-semibold flex items-center gap-2 hover:bg-primary-400 transition-all"
                 >
                   <Download size={20} />
                   Download Resume
