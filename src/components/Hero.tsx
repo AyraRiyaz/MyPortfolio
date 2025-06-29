@@ -87,7 +87,7 @@ const Hero = () => {
               className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
             >
               <a
-                href="/resume/Ayra_Riyaz_Resume.pdf"
+                href="public\Resume-Ayra.pdf"
                 download
                 target="_blank"
                 rel="noopener noreferrer"
