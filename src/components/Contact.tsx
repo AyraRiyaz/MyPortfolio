@@ -138,12 +138,7 @@ const Contact = () => {
       href: "https://github.com/AyraRiyaz",
       color: "hover:text-gray-400",
     },
-    {
-      icon: ExternalLink,
-      label: "Portfolio",
-      href: "https://ayrariyaz.github.io/MyPortfolio",
-      color: "hover:text-primary-400",
-    },
+    
   ];
 
   return (
