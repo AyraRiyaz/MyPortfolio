@@ -9,11 +9,13 @@ import Projects from "./components/Projects";
 import Experience from "./components/Experience";
 import Leadership from "./components/Leadership";
 import Contact from "./components/Contact";
+import MousePointer from "./components/MousePointer";
 
 function App() {
   return (
     <ThemeProvider>
       <div className="font-poppins bg-theme-bg min-h-screen transition-colors duration-300">
+        <MousePointer />
         <Navbar />
         <Hero />
         <About />

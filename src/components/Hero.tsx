@@ -53,6 +53,22 @@ const Hero = () => {
 
         <div className="relative z-10 flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
+            {/* Profile Picture */}
+            <div className="flex justify-center mb-6">
+              <motion.img
+                src="/image.jpg"
+                alt="Profile"
+                className="w-56 h-56 rounded-full object-cover border-4 border-primary-400 shadow-lg transition-all duration-300 select-none"
+                draggable={false}
+                whileHover={{
+                  scale: 1.1,
+                  rotate: 8,
+                  boxShadow: "0 8px 32px 0 rgba(80, 70, 229, 0.25)",
+                }}
+                transition={{ type: "spring", stiffness: 300 }}
+                style={{ outline: "none" }}
+              />
+            </div>
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
