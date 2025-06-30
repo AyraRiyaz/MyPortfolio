@@ -11,6 +11,7 @@ const Navbar = () => {
   const navItems = [
     { id: 'hero', label: 'Home' },
     { id: 'about', label: 'About' },
+    { id: 'education', label: 'Education' },
     { id: 'skills', label: 'Skills' },
     { id: 'projects', label: 'Projects' },
     { id: 'experience', label: 'Experience' },
@@ -39,9 +40,11 @@ const Navbar = () => {
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (section) {
-      // For mobile, close menu after scroll
-      section.scrollIntoView({ behavior: 'smooth' });
-      setTimeout(() => setIsOpen(false), 400); // Wait for scroll animation
+      // Calculate offset for fixed navbar height (adjust 80 if your navbar height is different)
+      const yOffset = -80;
+      const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+      setTimeout(() => setIsOpen(false), 400);
     } else {
       setIsOpen(false);
     }
