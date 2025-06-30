@@ -39,9 +39,13 @@ const Navbar = () => {
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (section) {
+      // For mobile, close menu after scroll
       section.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => setIsOpen(false), 400); // Wait for scroll animation
+    } else {
+      setIsOpen(false);
     }
-    setIsOpen(false);
+    setActiveSection(sectionId);
   };
 
   return (
